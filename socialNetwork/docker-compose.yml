@@ -158,12 +158,21 @@ services:
     #      - 11214:11211
     restart: always
 
+
   user-mongodb:
     image: mongo:4.4.6
     hostname: user-mongodb
-    # ports:
-    #   - 27023:27017
+    command: --replSet rs0
+    ports:
+      - 27023:27017
     restart: always
+
+  mongosetup:
+    image: mongo:4.4.6
+    depends_on:
+      - user-mongodb
+    restart: "no"
+    entrypoint: [ "bash", "-c", "sleep 10 && mongo --host user-mongodb:27017 --eval 'rs.initiate()'"]      
 
   media-service:
     image: deathstarbench/social-network-microservices:latest
